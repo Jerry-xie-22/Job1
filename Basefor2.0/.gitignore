@@ -1,0 +1,9 @@
+cache
+logs
+__pycache__
+outputs
+*.bin
+*.pt
+*.pth
+*.ckpt
+*.log

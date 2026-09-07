@@ -1,0 +1,4 @@
+acc,f1,prec,rec,eval_f1,dataset,method,text_backbone,seed,logger_name
+72.58,68.45,67.79,70.11,0.6953,MIntRec,mag_bert,bert-base-uncased,0,mag_bert_MIntRec_multi-class_0_2025-08-19-01-41-18
+70.56,66.17,66.37,67.07,0.6849,MIntRec,mag_bert,bert-base-uncased,1,mag_bert_MIntRec_multi-class_1_2025-08-19-01-55-17
+71.91,68.97,69.69,69.72,0.7066,MIntRec,mag_bert,bert-base-uncased,2,mag_bert_MIntRec_multi-class_2_2025-08-19-02-02-28

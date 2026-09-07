@@ -1,0 +1,11 @@
+acc,f1,prec,rec,weighted_f1,weighted_prec,weighted_rec,eval_f1,dataset,method,text_backbone,seed,logger_name,lr,dropout_prob,weight_decay,num_experts,nheads,n_levels,attn_dropout,embed_dropout
+71.46,68.32,68.35,69.21,71.81,73.06,71.46,0.6944,MIntRec,mag_bert,bert-base-uncased,0,mag_bert_MIntRec_multi-class_0_2026-05-28-07-21-07,2.5e-05,0.5,0.03,0,8,5,0.1,0.2
+70.79,67.69,67.86,68.66,71.1,72.55,70.79,0.7033,MIntRec,mag_bert,bert-base-uncased,1,mag_bert_MIntRec_multi-class_1_2026-05-28-08-35-00,2.5e-05,0.5,0.03,0,8,5,0.1,0.2
+72.13,68.37,69.72,68.07,71.85,72.43,72.13,0.7068,MIntRec,mag_bert,bert-base-uncased,2,mag_bert_MIntRec_multi-class_2_2026-05-28-08-52-37,2.5e-05,0.5,0.03,0,8,5,0.1,0.2
+72.36,68.5,68.43,69.69,71.92,72.88,72.36,0.6948,MIntRec,mag_bert,bert-base-uncased,3,mag_bert_MIntRec_multi-class_3_2026-05-28-09-19-31,2.5e-05,0.5,0.03,0,8,5,0.1,0.2
+71.24,66.66,67.87,66.9,71.15,72.02,71.24,0.7069,MIntRec,mag_bert,bert-base-uncased,4,mag_bert_MIntRec_multi-class_4_2026-05-28-09-33-03,2.5e-05,0.5,0.03,0,8,5,0.1,0.2
+70.11,65.94,67.49,65.38,70.21,71.13,70.11,0.7085,MIntRec,mag_bert,bert-base-uncased,5,mag_bert_MIntRec_multi-class_5_2026-05-28-09-48-49,2.5e-05,0.5,0.03,0,8,5,0.1,0.2
+71.46,67.46,68.48,68.19,71.05,72.44,71.46,0.7044,MIntRec,mag_bert,bert-base-uncased,6,mag_bert_MIntRec_multi-class_6_2026-05-28-10-10-20,2.5e-05,0.5,0.03,0,8,5,0.1,0.2
+71.01,67.45,68.47,68.05,70.61,71.99,71.01,0.7021,MIntRec,mag_bert,bert-base-uncased,7,mag_bert_MIntRec_multi-class_7_2026-05-28-10-41-29,2.5e-05,0.5,0.03,0,8,5,0.1,0.2
+71.91,67.67,67.57,68.34,71.79,72.15,71.91,0.7188,MIntRec,mag_bert,bert-base-uncased,8,mag_bert_MIntRec_multi-class_8_2026-05-28-11-06-32,2.5e-05,0.5,0.03,0,8,5,0.1,0.2
+72.13,67.7,68.34,67.79,71.64,71.78,72.13,0.6975,MIntRec,mag_bert,bert-base-uncased,9,mag_bert_MIntRec_multi-class_9_2026-05-28-11-30-05,2.5e-05,0.5,0.03,0,8,5,0.1,0.2
