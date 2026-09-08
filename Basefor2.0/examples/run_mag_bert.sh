@@ -41,7 +41,7 @@ conda activate mvcl-daf
 
 for dataset in "MIntRec2.0"
 do
-    for seed in 4 5
+    for seed in 2
     do
         python /public/home/202420144954/job1/Basefor2.0/run.py\
             --dataset $dataset \
@@ -54,8 +54,8 @@ do
             --logger_name 'intra_inter_fusion' \
             --log_path '/public/home/202420144954/job1/Basefor2.0/logs/rerun' \
             --config_file_name 'mag_bert' \
-            --results_file_name 'result45.csv' \
-            --results_path '/public/home/202420144954/job1/Basefor2.0/results_rerun' \
+            --results_file_name 'results_ablation.csv' \
+            --results_path '/public/home/202420144954/job1/Basefor2.0/results_ablation' \
             --video_feats_path 'video_feats.pkl' \
             --audio_feats_path 'audio_feats.pkl' \
             --text_backbone 'bert-large-uncased'

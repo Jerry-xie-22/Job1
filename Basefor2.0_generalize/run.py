@@ -38,7 +38,7 @@ def parse_arguments():
 
     parser.add_argument('--gpu_id', type=str, default='0', help="The used gpu index of your device.")
 
-    parser.add_argument("--data_path", default = '/public/home/202420144954/MIntRec-TCLMAP', type=str,
+    parser.add_argument("--data_path", default = '/public/home/202420144954/MIntRec-TCLMAP_generalize', type=str,
                         help="The input data dir. Should contain text, video and audio data for the task.")
 
     parser.add_argument("--train", action="store_true", help="Whether to train the model.")

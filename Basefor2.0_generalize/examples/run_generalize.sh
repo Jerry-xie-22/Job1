@@ -8,7 +8,7 @@
 #SBATCH --cpus-per-task=9
 #SBATCH --mem=100G
 #SBATCH --gres=gpu:1
-#SBATCH --time=24:00:00
+#SBATCH --time=1:00:00
 #SBATCH --exclude=gpu4
 set -e
 export MKL_DEBUG_CPU_TYPE=5
@@ -23,7 +23,7 @@ cd /public/home/202420144954/job1/Basefor2.0_generalize
 python run.py \
     --dataset MIntRec2.0 \
     --method mag_bert --data_mode multi-class \
-    --train --save_results --tune --seed 4 \
+    --train --save_results --tune --seed 2 \
     --config_file_name mag_bert \
     --log_path logs/generalize \
     --results_path results_generalize \

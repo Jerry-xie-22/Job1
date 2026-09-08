@@ -54,8 +54,8 @@ do
             --logger_name 'intra_inter_fusion' \
             --log_path '/public/home/202420144954/job1/Base/logs/rerun' \
             --config_file_name 'mag_bert' \
-            --results_file_name 'result_rerun_without.csv' \
-            --results_path '/public/home/202420144954/job1/Base/results_rerun' \
+            --results_file_name 'results_ablation.csv' \
+            --results_path '/public/home/202420144954/job1/Base/results_ablation' \
             --video_feats_path 'video_feats.pkl' \
             --audio_feats_path 'audio_feats.pkl' \
             --text_backbone 'bert-large-uncased'

@@ -266,7 +266,7 @@ class MAG_BERT:
 
         test_results = self._get_outputs(args, mode = 'test', return_sample_results=True, show_results = True)
         test_results['best_eval_score'] = round(self.best_eval_score, 4)
-    
+
         return test_results
 
 
