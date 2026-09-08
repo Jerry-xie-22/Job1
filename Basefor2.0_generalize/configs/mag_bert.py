@@ -52,7 +52,7 @@ class Param():
             'lr': [2e-05],
             'aligned_method': 'ctc',
             'weight_decay': [0.03],
-            'num_experts':[7],
+            'num_experts':[2],
             'nheads': [8], 
             'n_levels': [5], 
             'attn_dropout': [0.1], 
