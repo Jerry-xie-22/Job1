@@ -63,16 +63,6 @@ def parse_arguments():
 
     parser.add_argument('--audio_feats_path', type=str, default='audio_feats.pkl', help="The directory of the audio features.")
 
-    parser.add_argument(
-        '--ablation_mode',
-        choices=['full', 'label_cons_only', 'label_classifier_only', 'without_both'],
-        default='full',
-        help='MAG-BERT component combination used for the ablation experiment.')
-    parser.add_argument(
-        '--label_descriptions_path',
-        default='/public/home/202420144954/job2/Base_for_emo_mintrec10_c2f_inject_large/data/label_descriptions_mintrec.pt',
-        help='Label-description embeddings used by label-consistency loss and the label classifier.')
-
     parser.add_argument('--results_path', type=str, default='results', help="The path to save results.")
 
     parser.add_argument("--output_path", default= 'outputs', type=str, 

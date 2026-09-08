@@ -119,10 +119,6 @@ def save_results(args, test_results, debug_args = None):
 
     _vars = [args.dataset, args.method, args.text_backbone, args.seed, args.logger_name,args.lr,args.dropout_prob]
     _names = ['dataset',  'method', 'text_backbone', 'seed', 'logger_name','lr','dropout_prob']
-    if (getattr(args, 'method', None) == 'mag_bert'
-            and (debug_args is None or 'ablation_mode' not in debug_args)):
-        _vars.append(args.ablation_mode)
-        _names.append('ablation_mode')
 
     if debug_args is not None:
         _vars.extend([args[key] for key in debug_args.keys()])

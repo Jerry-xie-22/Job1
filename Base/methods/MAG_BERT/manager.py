@@ -30,25 +30,13 @@ class MAG_BERT:
         
         self.args = args
         self.criterion = nn.CrossEntropyLoss()
-        self.use_label_classifier = args.ablation_mode in ('full', 'label_classifier_only')
-        self.use_label_cons_loss = args.ablation_mode in ('full', 'label_cons_only')
-        self.logger.info(
-            'Ablation mode=%s, label_classifier=%s, label_cons_loss=%s',
-            args.ablation_mode, self.use_label_classifier, self.use_label_cons_loss)
-        self.label_cons_criterion = (
-            TripletContrastiveLoss(device=self.device, temperature=0.07)
-            if self.use_label_cons_loss else None)
+        self.label_cons_criterion = TripletContrastiveLoss(device = self.device, temperature=0.07)
         self.metrics = Metrics(args)
-        self.label_classifier = None
-        if self.use_label_classifier:
-            self.label_classifier = MoELabelAttentionClassifier(
-                num_experts=args.num_experts,
-                hidden_dim=1024
-            ).to(self.device)
-        self.label_embeddings = None
-        if self.use_label_classifier or self.use_label_cons_loss:
-            self.label_embeddings = self._load_label_embeddings(
-                args.label_descriptions_path, args.num_labels)
+        # job1
+        self.label_classifier = MoELabelAttentionClassifier(
+            num_experts=args.num_experts,
+            hidden_dim=1024
+        ).to(self.device)
 
         self.optimizer, self.scheduler = self._set_optimizer(args, data, self.model)
 
@@ -56,50 +44,14 @@ class MAG_BERT:
             self.best_eval_score = 0
         else:
             self.model = restore_model(self.model, args.model_output_path)
-            if self.use_label_classifier:
-                classifier_path = os.path.join(args.model_output_path, 'label_classifier.bin')
-                self.label_classifier.load_state_dict(
-                    torch.load(classifier_path, map_location=self.device))
-
-    def _load_label_embeddings(self, path, num_labels):
-        descriptions = torch.load(path, map_location='cpu')
-        intent_to_embeddings = defaultdict(list)
-        for item in descriptions.values():
-            intent = int(item['intent'])
-            intent_to_embeddings[intent].append(
-                torch.as_tensor(item['embedding']).view(-1))
-
-        expected_intents = set(range(num_labels))
-        if set(intent_to_embeddings) != expected_intents:
-            raise ValueError(
-                f'Label descriptions must contain exactly IDs 0..{num_labels - 1}; '
-                f'got {sorted(intent_to_embeddings)}')
-        invalid_counts = {
-            intent: len(embeddings)
-            for intent, embeddings in intent_to_embeddings.items()
-            if len(embeddings) != 3
-        }
-        if invalid_counts:
-            raise ValueError(
-                f'Each intent must have exactly three descriptions; got {invalid_counts}')
-
-        return torch.stack([
-            torch.stack(intent_to_embeddings[intent], dim=0)
-            for intent in range(num_labels)
-        ], dim=0).to(self.device)
 
     def _set_optimizer(self, args, data, model):
         
-        param_optimizer = [(f'model.{name}', param) for name, param in model.named_parameters()]
-        if self.use_label_classifier:
-            param_optimizer.extend(
-                (f'label_classifier.{name}', param)
-                for name, param in self.label_classifier.named_parameters())
-        if self.use_label_cons_loss:
-            param_optimizer.extend(
-                (f'label_cons_criterion.{name}', param)
-                for name, param in self.label_cons_criterion.named_parameters())
+        # job1
+        param_optimizer = list(model.named_parameters())+ list(self.label_classifier.named_parameters()) + list(self.label_cons_criterion.named_parameters())
         no_decay = ['bias', 'LayerNorm.bias', 'LayerNorm.weight','logit_scales', 'loss_scale']
+        param_optimizer = list(model.named_parameters())
+        no_decay = ['bias', 'LayerNorm.bias', 'LayerNorm.weight']
         
         optimizer_grouped_parameters = [
             {'params': [p for n, p in param_optimizer if not any(nd in n for nd in no_decay)], 'weight_decay': args.weight_decay},
@@ -123,8 +75,6 @@ class MAG_BERT:
         
         for epoch in trange(int(args.num_train_epochs), desc="Epoch"):
             self.model.train()
-            if self.use_label_classifier:
-                self.label_classifier.train()
             loss_record = AverageMeter()
             cls_loss_record = AverageMeter()
             label_cons_loss_record = AverageMeter()
@@ -147,20 +97,55 @@ class MAG_BERT:
                     # 输出句子向量
                     cls_output = outputs[1]
 
-                    if self.use_label_classifier:
-                        prediction_logits, _ = self.label_classifier(
-                            cls_output, self.label_embeddings)
-                    else:
-                        prediction_logits = logits
-                    cls_loss = self.criterion(prediction_logits, label_ids)
+                    cls_loss = self.criterion(logits, label_ids)
 
-                    if self.use_label_cons_loss:
-                        label_cons_loss = self.label_cons_criterion(
-                            cls_output, self.label_embeddings, label_ids)
-                    else:
-                        label_cons_loss = cls_loss.new_zeros(())
+                    # 加载标签描述向量
+                    label_description_embedding = torch.load("/public/home/202420144954/job2/Base_for_emo_mintrec10_c2f_inject_large/data/label_descriptions_mintrec.pt") 
+                    intent_to_embeddings = defaultdict(list)
+                    for item in label_description_embedding.values():
+                        intent = item["intent"]
+                        emb = item["embedding"]  # shape: [L, D]
+                        intent_to_embeddings[intent].append(torch.tensor(emb))
+                    # 2. 保证每个 intent 恰好有 3 个描述
+                    for k, v in intent_to_embeddings.items():
+                        assert len(v) == 3, f"Intent {k} does not have exactly 3 embeddings"
+                    
+                    # 基于标签描述计算分类损失
+                    all_label_embeds = []
+                    for label_idx in range(args.num_labels):
+                        # [3, D]
+                        embs = torch.stack(intent_to_embeddings[label_idx], dim=0).to(self.device)
+                        all_label_embeds.append(embs)
+                    all_label_embeds = torch.stack(all_label_embeds, dim=0)  # [num_labels, 3, D]
 
+                    # job1废弃的不要的
+                    # cls_output_norm = F.normalize(cls_output, dim=-1)  # 归一化 [B, D]
+                    # label_embeds_norm = F.normalize(all_label_embeds, dim=-1)  # 归一化 [num_labels, 3, D]
+                    # sim = torch.einsum('bd, lcd -> blc', cls_output_norm, label_embeds_norm) # 相似度计算: [B, num_labels, 3]
+                    # sim_scores = sim.sum(dim=-1)  # 每个标签的三个描述向量相似度求和 [B, num_labels]
+
+                    # job1
+                    sim_scores, weights = self.label_classifier(cls_output, all_label_embeds)
+                    cls_loss = self.criterion(sim_scores, label_ids) # 交叉熵分类损失
+
+                    # 3. 构造 [T, 3, D] 张量
+                    all_intents = sorted(intent_to_embeddings.keys())   # 保证固定顺序
+                    label_embed_all = []
+                    for intent in all_intents:
+                        emb_list = intent_to_embeddings[intent]   # list of 3 tensors, 每个 [1, D]
+                        emb_list = [e.view(1, -1) for e in emb_list]
+                        stacked = torch.cat(emb_list, dim=0)      # [3, D]
+                        label_embed_all.append(stacked)
+
+                    label_embed = torch.stack(label_embed_all, dim=0).to(self.device)  # [T, 3, D]
+                    # print("cls_output:", cls_output.shape)   # 期望 [B, D]
+                    # print("label_desc:", label_embed.shape)   # 期望 [T, 3, D]
+
+                    label_cons_loss = self.label_cons_criterion(cls_output, label_embed,label_ids)
+
+                    # job1
                     loss = cls_loss + label_cons_loss
+                    # loss = cls_loss
 
                     self.optimizer.zero_grad()
 
@@ -187,28 +172,18 @@ class MAG_BERT:
             for key in eval_results.keys():
                 self.logger.info("  %s = %s", key, str(eval_results[key]))
          
-            modules_to_track = {'model': self.model}
-            if self.use_label_classifier:
-                modules_to_track['label_classifier'] = self.label_classifier
-            early_stopping(eval_score, modules_to_track)
+            early_stopping(eval_score, self.model)
 
             if early_stopping.early_stop:
                 self.logger.info(f'EarlyStopping at epoch {epoch + 1}')
                 break
 
         self.best_eval_score = early_stopping.best_score
-        best_modules = early_stopping.best_model
-        self.model = best_modules['model']
-        if self.use_label_classifier:
-            self.label_classifier = best_modules['label_classifier']
+        self.model = early_stopping.best_model   
         
         if args.save_model:
             self.logger.info('Trained models are saved in %s', args.model_output_path)
-            save_model(self.model, args.model_output_path)
-            if self.use_label_classifier:
-                torch.save(
-                    self.label_classifier.state_dict(),
-                    os.path.join(args.model_output_path, 'label_classifier.bin'))
+            save_model(self.model, args.model_output_path)   
 
     def _get_outputs(self, args, mode = 'eval', return_sample_results = False, show_results = False):
         
@@ -220,8 +195,6 @@ class MAG_BERT:
             dataloader = self.train_dataloader
 
         self.model.eval()
-        if self.use_label_classifier:
-            self.label_classifier.eval()
 
         total_labels = torch.empty(0,dtype=torch.long).to(self.device)
         total_preds = torch.empty(0,dtype=torch.long).to(self.device)
@@ -248,17 +221,44 @@ class MAG_BERT:
                 logits = output[0]
                 cls_output = output[1]
 
-                if self.use_label_classifier:
-                    prediction_logits, _ = self.label_classifier(
-                        cls_output, self.label_embeddings)
-                else:
-                    prediction_logits = logits
+                # 加载标签描述向量
+                label_description_embedding = torch.load("/public/home/202420144954/job2/Base_for_emo_mintrec10_c2f_inject_large/data/label_descriptions_mintrec.pt") 
+                intent_to_embeddings = defaultdict(list)
+                for item in label_description_embedding.values():
+                    intent = item["intent"]
+                    emb = item["embedding"]  # shape: [L, D]
+                    intent_to_embeddings[intent].append(torch.tensor(emb))
+                # 2. 保证每个 intent 恰好有 3 个描述
+                for k, v in intent_to_embeddings.items():
+                    assert len(v) == 3, f"Intent {k} does not have exactly 3 embeddings"
+                    
+                # 基于标签描述计算分类损失
+                all_label_embeds = []
+                for label_idx in range(args.num_labels):
+                    # [3, D]
+                    embs = torch.stack(intent_to_embeddings[label_idx], dim=0).to(self.device)
+                    all_label_embeds.append(embs)
 
-                total_logits = torch.cat((total_logits, prediction_logits))
+                all_label_embeds = torch.stack(all_label_embeds, dim=0)  # [num_labels, 3, D]
+
+                # job1废弃的不要的
+                # cls_output_norm = F.normalize(cls_output, dim=-1)  # 归一化 [B, D]
+                # label_embeds_norm = F.normalize(all_label_embeds, dim=-1)  # 归一化 [num_labels, 3, D]
+                # sim = torch.einsum('bd, lcd -> blc', cls_output_norm, label_embeds_norm) # 相似度计算: [B, num_labels, 3]
+                # sim_scores = sim.sum(dim=-1)  # 每个标签的三个描述向量相似度求和 [B, num_labels]
+
+                # job1
+                sim_scores, weights = self.label_classifier(cls_output, all_label_embeds)
+                
+                # job1
+                # total_logits = torch.cat((total_logits, logits))
+                total_logits = torch.cat((total_logits, sim_scores))
 
                 total_labels = torch.cat((total_labels, label_ids))
  
-                loss = self.criterion(prediction_logits, label_ids)
+                # job1
+                # loss = self.criterion(logits, label_ids)
+                loss = self.criterion(sim_scores, label_ids) 
 
 
                 loss_record.update(loss.item(), label_ids.size(0))
@@ -300,7 +300,6 @@ class MAG_BERT:
 
         test_results = self._get_outputs(args, mode = 'test', return_sample_results=True, show_results = True)
         test_results['best_eval_score'] = round(self.best_eval_score, 4)
-        os.makedirs(args.results_path, exist_ok=True)
 
         # 统计预测标签与真实标签
         y_true = test_results.get('y_true', [])
@@ -310,8 +309,7 @@ class MAG_BERT:
 
         label_list = args.label_list if hasattr(args, 'label_list') else None
 
-        tsv_output_path = os.path.join(
-            args.results_path, f'test_predictions_{args.ablation_mode}.tsv')
+        tsv_output_path = os.path.join(args.results_path, 'test_predictions_without_module.tsv')
         with open(tsv_output_path, 'w', newline='', encoding='utf-8') as f:
             writer = csv.writer(f, delimiter='\t')
             writer.writerow(['index', 'text', 'true_label', 'true_label_id', 'pred_label', 'pred_label_id'])
@@ -331,8 +329,7 @@ class MAG_BERT:
         per_class_rec = recall_score(y_true, y_pred, average=None, labels=labels)
         per_class_f1 = f1_score(y_true, y_pred, average=None, labels=labels)
 
-        each_class_path = os.path.join(
-            args.results_path, f'output_show_each_class_{args.ablation_mode}.tsv')
+        each_class_path = os.path.join(args.results_path, 'output_show_each_class.tsv')
         with open(each_class_path, 'w', newline='', encoding='utf-8') as f:
             writer = csv.writer(f, delimiter='\t')
             writer.writerow(['label_id', 'label_name', 'prec', 'rec', 'f1'])
