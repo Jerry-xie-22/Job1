@@ -1,4 +1,0 @@
-acc,f1,prec,rec,weighted_f1,weighted_prec,weighted_rec,eval_f1,dataset,method,text_backbone,seed,logger_name,lr,dropout_prob,weight_decay,num_experts,nheads,n_levels,attn_dropout,embed_dropout
-75.96,72.53,72.61,73.06,75.74,75.99,75.96,0.6993,MIntRec,mag_bert,bert-base-uncased,0,mag_bert_MIntRec_multi-class_0_2026-04-29-03-13-56,2.5e-05,0.5,0.03,0,8,5,0.1,0.2
-72.81,69.91,72.21,70.01,72.61,74.45,72.81,0.6964,MIntRec,mag_bert,bert-base-uncased,0,mag_bert_MIntRec_multi-class_0_2026-04-29-03-51-14,2.5e-05,0.5,0.03,4,8,5,0.1,0.2
-75.96,72.53,72.61,73.06,75.74,75.99,75.96,0.6993,MIntRec,mag_bert,bert-base-uncased,0,mag_bert_MIntRec_multi-class_0_2026-04-29-04-03-31,2.5e-05,0.5,0.03,0,8,5,0.1,0.2

@@ -1,0 +1,70 @@
+============================== Params ==============================
+logger_name: mag_bert_MIntRec_multi-class_3_2026-09-08-10-23-04
+dataset: MIntRec
+data_mode: multi-class
+method: mag_bert
+text_backbone: bert-large-uncased
+seed: 3
+num_workers: 8
+gpu_id: 0
+data_path: /public/home/202420144954/MIntRec-TCLMAP_generalize
+train: True
+tune: True
+save_model: False
+save_results: True
+log_path: logs/generalize
+cache_path: cache
+video_data_path: video_data
+audio_data_path: audio_data
+video_feats_path: video_feats.pkl
+audio_feats_path: audio_feats.pkl
+test_video_feats_path: video_feats2.pkl
+test_audio_feats_path: audio_feats2.pkl
+results_path: results_generalize
+output_path: outputs
+model_path: models
+config_file_name: mag_bert
+results_file_name: mintrec_to_mintrec20.csv
+padding_mode: zero
+padding_loc: end
+need_aligned: True
+eval_monitor: f1
+train_batch_size: 16
+eval_batch_size: 8
+test_batch_size: 8
+wait_patience: 4
+num_train_epochs: 100
+beta_shift: 0.005
+dropout_prob: 0.6
+warmup_proportion: 0.1
+lr: 2.5e-05
+aligned_method: ctc
+weight_decay: 0.03
+num_experts: 3
+nheads: 8
+n_levels: 5
+attn_dropout: 0.1
+relu_dropout: 0.0
+embed_dropout: 0.2
+res_dropout: 0.1
+attn_mask: True
+pred_output_path: outputs/mag_bert_MIntRec_multi-class_3_2026-09-08-10-23-04
+model_output_path: outputs/mag_bert_MIntRec_multi-class_3_2026-09-08-10-23-04/models
+============================== End Params ==============================
+train (MIntRec): retained 1334/1334; excluded labels={}
+dev (MIntRec): retained 445/445; excluded labels={}
+test (MIntRec2.0): retained 1388/2033; excluded labels={'Confirm': 93, 'Explain': 193, 'Acknowledge': 68, 'Emphasize': 17, 'Doubt': 135, 'Asking for opinions': 48, 'Invite': 17, 'Plan': 38, 'Warn': 19, 'Refuse': 17}
+Generate Text Features Begin...
+Generate Text Features Finished...
+Traceback (most recent call last):
+  File "run.py", line 186, in <module>
+    run(args, debug_args=debug_args)
+  File "run.py", line 136, in run
+    data = DataManager(args)
+  File "/public/home/202420144954/job1/Base_generalize/data/base.py", line 62, in __init__
+    'video': VideoDataset(args, attrs).feats,
+  File "/public/home/202420144954/job1/Base_generalize/data/video_pre.py", line 8, in __init__
+    self.feats = load_modality(args, base_attrs, 'video')
+  File "/public/home/202420144954/job1/Base_generalize/data/generalize.py", line 84, in load_modality
+    with open(path, 'rb') as stream:
+FileNotFoundError: [Errno 2] No such file or directory: '/public/home/202420144954/MIntRec-TCLMAP_generalize/MIntRec/video_data/video_feats2.pkl'
