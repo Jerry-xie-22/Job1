@@ -62,6 +62,13 @@ def parse_arguments():
     parser.add_argument('--video_feats_path', type=str, default='video_feats.pkl', help="The directory of the video features.")
 
     parser.add_argument('--audio_feats_path', type=str, default='audio_feats.pkl', help="The directory of the audio features.")
+    parser.add_argument('--train_tsv_path', default='MIntRec2.0_train_20.tsv',
+                        help='Bundled MIntRec2.0 train split filtered to the shared 20 labels.')
+    parser.add_argument('--dev_tsv_path', default='MIntRec2.0_dev_20.tsv',
+                        help='Bundled MIntRec2.0 dev split filtered to the shared 20 labels.')
+    parser.add_argument('--label_descriptions_path',
+                        default='/public/home/202420144954/job2/Base_for_emo_mintrec10_c2f_inject_large/data/label_descriptions_mintrec.pt',
+                        help='MIntRec 20-class label-description embedding file.')
     parser.add_argument('--test_audio_feats_path', default='audio_feats1.pkl',
                         help='MIntRec test features inside the source audio_data directory.')
     parser.add_argument('--test_video_feats_path', default='video_feats1.pkl',

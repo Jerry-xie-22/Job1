@@ -20,13 +20,14 @@ class DataManager:
         self.logger = logging.getLogger(logger_name or args.logger_name)
         if args.dataset != 'MIntRec2.0':
             raise ValueError('Basefor2.0_generalize supports MIntRec2.0 -> MIntRec only')
+        # MIntRec2.0's label list is deliberately reduced and reordered in data/__init__.py.
         self.benchmarks = copy.deepcopy(benchmarks['MIntRec2.0'])
         self.data_path = os.path.join(args.data_path, args.dataset)
         if args.data_mode == 'multi-class':
             self.label_list = self.benchmarks['intent_labels']
             binary_maps = None
         else:
-            raise ValueError('This experiment requires multi-class mode (30 source labels)')
+            raise ValueError('This experiment requires multi-class mode (20 shared labels)')
         args.num_labels = len(self.label_list)
         args.label_list = self.label_list
         self.benchmarks['max_seq_lengths'] = {
@@ -39,13 +40,18 @@ class DataManager:
             setattr(args, f'{modality}_feat_dim', self.benchmarks['feat_dims'][modality])
         self.generalization_report = {
             'source_dataset': 'MIntRec2.0', 'target_dataset': 'MIntRec',
-            'protocol': '30-class source classifier on all MIntRec test samples',
+            'protocol': '20-class shared-label evaluation',
             'label_order': self.label_list,
             'splits': {},
         }
         for split in ('train', 'dev', 'test'):
             dataset = 'MIntRec' if split == 'test' else 'MIntRec2.0'
-            path = os.path.join(self.data_path, f'{split}.tsv')
+            if split == 'test':
+                path = os.path.join(self.data_path, 'test.tsv')
+            else:
+                configured_path = getattr(args, f'{split}_tsv_path')
+                path = configured_path if os.path.isabs(configured_path) else os.path.join(
+                    os.path.dirname(os.path.dirname(__file__)), configured_path)
             indexes, labels, texts, skipped = read_annotations(
                 path, dataset, self.label_list, binary_maps, filter_unknown=False)
             setattr(self, f'{split}_data_index', indexes)

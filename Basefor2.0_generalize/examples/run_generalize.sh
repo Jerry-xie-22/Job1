@@ -32,4 +32,7 @@ python run.py \
     --audio_feats_path audio_feats.pkl \
     --test_video_feats_path video_feats1.pkl \
     --test_audio_feats_path audio_feats1.pkl \
+    --train_tsv_path MIntRec2.0_train_20.tsv \
+    --dev_tsv_path MIntRec2.0_dev_20.tsv \
+    --label_descriptions_path /public/home/202420144954/job2/Base_for_emo_mintrec10_c2f_inject_large/data/label_descriptions_mintrec.pt \
     --text_backbone bert-large-uncased

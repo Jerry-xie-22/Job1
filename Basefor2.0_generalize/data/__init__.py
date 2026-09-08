@@ -28,12 +28,10 @@ benchmarks = {
     },
     'MIntRec2.0': {
         'intent_labels': [
-            'Acknowledge', 'Advise', 'Agree', 'Apologise', 'Arrange', 
-            'Ask for help', 'Asking for opinions', 'Care', 'Comfort', 'Complain', 
-            'Confirm', 'Criticize', 'Doubt', 'Emphasize', 'Explain', 
-            'Flaunt', 'Greet', 'Inform', 'Introduce', 'Invite', 
-            'Joke', 'Leave', 'Oppose', 'Plan', 'Praise', 
-            'Prevent', 'Refuse', 'Taunt', 'Thank', 'Warn',
+            'Complain', 'Praise', 'Apologise', 'Thank', 'Criticize',
+            'Agree', 'Taunt', 'Flaunt', 'Joke', 'Oppose',
+            'Comfort', 'Care', 'Inform', 'Advise', 'Arrange', 'Introduce',
+            'Leave', 'Prevent', 'Greet', 'Ask for help'
         ],
         'speaker_list' : ['friends person5', 'Cheyenne', 'Tate', 'Joey', 'Chandler', 'Dina', 'Myrtle', 'Sheldon', 'Garrett', 'Amy', 'Rajesh', 'Justine', 'friends person4', 
             'Leonard', 'friends person2', 'Janet', 'Jerry', 'Glenn', 'big bang person1', 'Penny', 'superstore person1', 'superstore person2', 'superstore person4',

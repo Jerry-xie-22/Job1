@@ -103,8 +103,9 @@ def load_modality(args, attrs, modality):
     logger.info('%s feature widths=%s; unified shape=(%d, %d); source=%s; test=%s',
                 modality, widths, length, width, source_path, target_path)
     if widths['train'] != widths['test']:
-        logger.warning('%s widths differ: zero-padding provides shape compatibility only; '
-                       'it does not align the semantic feature spaces.', modality)
+        raise ValueError(
+            f'{modality}: source/test feature widths differ ({widths["train"]} vs '
+            f'{widths["test"]}); extract both datasets with the same feature encoder')
     attrs['generalization_report'][modality] = {
         'source_path': source_path, 'test_path': target_path,
         'widths': widths, 'output_width': width, 'sequence_length': length,

@@ -73,7 +73,7 @@ class GeneralizationTests(unittest.TestCase):
         folder = self.root / (modality + '_data')
         folder.mkdir()
         # Same ID in different domains: test must select the target pickle.
-        source = {'same': np.full((2, 1, 2), 1), 'dev': np.full((1, 2), 2)}
+        source = {'same': np.full((2, 1, 4), 1), 'dev': np.full((1, 4), 2)}
         target = {'same': np.full((1, 4), 7)}
         for name, values in ((modality + '_feats.pkl', source),
                              (modality + '_feats1.pkl', target)):
@@ -96,10 +96,18 @@ class GeneralizationTests(unittest.TestCase):
             self.assertEqual(getattr(args, modality + '_feat_dim'), 4)
             self.assertEqual(feats['test'][0].shape, (3, 4))
             np.testing.assert_array_equal(feats['test'][0][0], [7, 7, 7, 7])
-            np.testing.assert_array_equal(feats['train'][0][0], [1, 1, 0, 0])
+            np.testing.assert_array_equal(feats['train'][0][0], [1, 1, 1, 1])
             attrs['test_data_index'] = ['missing']
             with self.assertRaisesRegex(KeyError, 'missing test sample'):
                 load_modality(args, attrs, modality)
+
+    def test_mismatched_domain_widths_are_rejected(self):
+        args, attrs = self.feature_fixture('video')
+        path = self.root / 'video_data/video_feats1.pkl'
+        with path.open('wb') as stream:
+            pickle.dump({'same': np.ones((1, 2))}, stream)
+        with self.assertRaisesRegex(ValueError, 'source/test feature widths differ'):
+            load_modality(args, attrs, 'video')
 
     def test_text_uses_filtered_annotations_not_raw_tsv(self):
         # No local transformers/BERT weights needed: stub only the tokenizer boundary.
@@ -122,21 +130,26 @@ class GeneralizationTests(unittest.TestCase):
         samples = ROOT.parent / 'MInteRec_data'
         if not samples.exists():
             self.skipTest('Local TSV reference files are not part of the code repository')
+        expected_counts = {'train': 4125, 'dev': 726}
         for split in ('train', 'dev'):
-            ids, labels, texts, skipped = read_annotations(
-                samples / 'MIntRec2.0' / (split + '.tsv'), 'MIntRec2.0', self.labels)
-            self.assertFalse(skipped)
-            self.assertEqual(len(ids), len(texts))
+            source = samples / 'MIntRec2.0' / (split + '.tsv')
+            bundled = ROOT / f'MIntRec2.0_{split}_20.tsv'
+            expected = read_annotations(source, 'MIntRec2.0', self.labels, filter_unknown=True)
+            actual = read_annotations(bundled, 'MIntRec2.0', self.labels)
+            self.assertEqual(actual[:3], expected[:3])
+            self.assertEqual(len(actual[0]), expected_counts[split])
+            self.assertEqual(sum(expected[3].values()),
+                             {'train': 2040, 'dev': 380}[split])
         ids, labels, texts, skipped = read_annotations(
             samples / 'MIntRec/test.tsv', 'MIntRec', self.labels)
         self.assertEqual(len(ids), len(texts))
-        self.assertTrue(all(0 <= label < 30 for label in labels))
+        self.assertTrue(all(0 <= label < 20 for label in labels))
         self.assertFalse(skipped)
         with (samples / 'MIntRec/test.tsv').open(encoding='utf-8-sig', newline='') as stream:
             raw_rows = list(csv.DictReader(stream, delimiter='\t'))
         self.assertEqual(len(ids), len(raw_rows))
         self.assertEqual(labels[0], self.labels.index('Arrange'))
-        self.assertNotEqual(labels[0], benchmarks['MIntRec']['intent_labels'].index('Arrange'))
+        self.assertEqual(labels[0], benchmarks['MIntRec']['intent_labels'].index('Arrange'))
         print(f'Target TSV: retained={len(ids)}, excluded={sum(skipped.values())}, labels={skipped}')
 
     def test_data_manager_end_to_end_with_tensor_and_tokenizer_stubs(self):
@@ -147,15 +160,15 @@ class GeneralizationTests(unittest.TestCase):
         dataset_dir.mkdir()
         self.root = dataset_dir
         source_header = ['Dialogue_id', 'Utterance_id', 'Text', 'Label']
-        self.write_tsv('train.tsv', [source_header, ['1', '1', 'source train', 'Confirm']])
-        self.write_tsv('dev.tsv', [source_header, ['2', '1', 'source dev', 'Explain']])
+        train_path = self.write_tsv('train.tsv', [source_header, ['1', '1', 'source train', 'Inform']])
+        dev_path = self.write_tsv('dev.tsv', [source_header, ['2', '1', 'source dev', 'Greet']])
         self.write_tsv('test.tsv', [['season', 'episode', 'clip', 'text', 'label'],
                                   ['S01', 'E01', '1', 'target text', 'Arrange']])
         for modality in ('audio', 'video'):
             folder = dataset_dir / (modality + '_data')
             folder.mkdir()
-            for suffix, mapping in [('', {'dia1_utt1': np.ones((2, 1, 2)),
-                                         'dia2_utt1': np.ones((1, 2))}),
+            for suffix, mapping in [('', {'dia1_utt1': np.ones((2, 1, 4)),
+                                         'dia2_utt1': np.ones((1, 4))}),
                                     ('1', {'S01_E01_1': np.full((1, 4), 7)})]:
                 with (folder / (modality + '_feats' + suffix + '.pkl')).open('wb') as f:
                     pickle.dump(mapping, f)
@@ -179,12 +192,13 @@ class GeneralizationTests(unittest.TestCase):
             audio_data_path='audio_data', video_data_path='video_data',
             audio_feats_path='audio_feats.pkl', video_feats_path='video_feats.pkl',
             test_audio_feats_path='audio_feats1.pkl', test_video_feats_path='video_feats1.pkl',
+            train_tsv_path=str(train_path), dev_tsv_path=str(dev_path),
             padding_mode='zero', padding_loc='end', train_batch_size=2, eval_batch_size=3,
             test_batch_size=4, num_workers=0, results_path=str(dataset_dir / 'reports'))
         original_width = benchmarks['MIntRec2.0']['feat_dims']['video']
         with patch.dict(sys.modules, fake_modules):
             manager = import_module('data.base').DataManager(args)
-        self.assertEqual(args.num_labels, 30)
+        self.assertEqual(args.num_labels, 20)
         self.assertEqual((args.text_seq_len, args.video_seq_len, args.audio_seq_len), (76, 230, 480))
         self.assertEqual((args.video_feat_dim, args.audio_feat_dim), (4, 4))
         sample = manager.mm_data['test'][0]
@@ -200,6 +214,11 @@ class GeneralizationTests(unittest.TestCase):
         self.assertEqual(report['splits']['test']['coverage'], 1)
         self.assertEqual(report['source_dataset'], 'MIntRec2.0')
         self.assertEqual(benchmarks['MIntRec2.0']['feat_dims']['video'], original_width)
+
+    def test_shared_label_order_matches_mintrec(self):
+        self.assertEqual(benchmarks['MIntRec2.0']['intent_labels'],
+                         benchmarks['MIntRec']['intent_labels'])
+        self.assertEqual(len(self.labels), 20)
 
 
 if __name__ == '__main__':

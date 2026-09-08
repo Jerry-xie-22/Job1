@@ -92,12 +92,17 @@ class MAG_BERT:
                     # cls_loss = self.criterion(logits, label_ids)
 
                     # 加载标签描述向量
-                    label_description_embedding = torch.load("/public/home/202420144954/MIntRec-TCLMAP/MIntRec2.0/label_descriptions_mintrec2.0.pt") 
+                    label_description_embedding = torch.load(args.label_descriptions_path)
                     intent_to_embeddings = defaultdict(list)
                     for item in label_description_embedding.values():
                         intent = item["intent"]
                         emb = item["embedding"]  # shape: [L, D]
                         intent_to_embeddings[intent].append(torch.tensor(emb))
+                    expected_intents = set(range(args.num_labels))
+                    if set(intent_to_embeddings) != expected_intents:
+                        raise ValueError(
+                            f'Label descriptions must contain exactly the intent IDs '
+                            f'0..{args.num_labels - 1}; got {sorted(intent_to_embeddings)}')
                     # 2. 保证每个 intent 恰好有 3 个描述
                     for k, v in intent_to_embeddings.items():
                         assert len(v) == 3, f"Intent {k} does not have exactly 3 embeddings"
@@ -117,7 +122,7 @@ class MAG_BERT:
                     cls_loss = self.criterion(sim_scores, label_ids) # 交叉熵分类损失
 
                     # 3. 构造 [T, 3, D] 张量
-                    all_intents = sorted(intent_to_embeddings.keys())   # 保证固定顺序
+                    all_intents = range(args.num_labels)   # 与 data/__init__.py 的标签编号一致
                     label_embed_all = []
                     for intent in all_intents:
                         emb_list = intent_to_embeddings[intent]   # list of 3 tensors, 每个 [1, D]
@@ -204,12 +209,17 @@ class MAG_BERT:
                 cls_output = output[1]
 
                 # 加载标签描述向量
-                label_description_embedding = torch.load("/public/home/202420144954/MIntRec-TCLMAP/MIntRec2.0/label_descriptions_mintrec2.0.pt") 
+                label_description_embedding = torch.load(args.label_descriptions_path)
                 intent_to_embeddings = defaultdict(list)
                 for item in label_description_embedding.values():
                     intent = item["intent"]
                     emb = item["embedding"]  # shape: [L, D]
                     intent_to_embeddings[intent].append(torch.tensor(emb))
+                expected_intents = set(range(args.num_labels))
+                if set(intent_to_embeddings) != expected_intents:
+                    raise ValueError(
+                        f'Label descriptions must contain exactly the intent IDs '
+                        f'0..{args.num_labels - 1}; got {sorted(intent_to_embeddings)}')
                 # 2. 保证每个 intent 恰好有 3 个描述
                 for k, v in intent_to_embeddings.items():
                     assert len(v) == 3, f"Intent {k} does not have exactly 3 embeddings"
