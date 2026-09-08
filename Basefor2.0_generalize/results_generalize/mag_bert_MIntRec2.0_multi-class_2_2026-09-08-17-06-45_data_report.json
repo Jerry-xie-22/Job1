@@ -1,0 +1,95 @@
+{
+  "source_dataset": "MIntRec2.0",
+  "target_dataset": "MIntRec",
+  "protocol": "30-class source classifier on all MIntRec test samples",
+  "label_order": [
+    "Acknowledge",
+    "Advise",
+    "Agree",
+    "Apologise",
+    "Arrange",
+    "Ask for help",
+    "Asking for opinions",
+    "Care",
+    "Comfort",
+    "Complain",
+    "Confirm",
+    "Criticize",
+    "Doubt",
+    "Emphasize",
+    "Explain",
+    "Flaunt",
+    "Greet",
+    "Inform",
+    "Introduce",
+    "Invite",
+    "Joke",
+    "Leave",
+    "Oppose",
+    "Plan",
+    "Praise",
+    "Prevent",
+    "Refuse",
+    "Taunt",
+    "Thank",
+    "Warn"
+  ],
+  "splits": {
+    "train": {
+      "path": "/public/home/202420144954/MIntRec-TCLMAP_generalize/MIntRec2.0/train.tsv",
+      "dataset": "MIntRec2.0",
+      "total": 6165,
+      "retained": 6165,
+      "excluded_by_label": {},
+      "coverage": 1.0
+    },
+    "dev": {
+      "path": "/public/home/202420144954/MIntRec-TCLMAP_generalize/MIntRec2.0/dev.tsv",
+      "dataset": "MIntRec2.0",
+      "total": 1106,
+      "retained": 1106,
+      "excluded_by_label": {},
+      "coverage": 1.0
+    },
+    "test": {
+      "path": "/public/home/202420144954/MIntRec-TCLMAP_generalize/MIntRec2.0/test.tsv",
+      "dataset": "MIntRec",
+      "total": 445,
+      "retained": 445,
+      "excluded_by_label": {},
+      "coverage": 1.0
+    }
+  },
+  "video": {
+    "source_path": "/public/home/202420144954/MIntRec-TCLMAP_generalize/MIntRec2.0/video_data/video_feats.pkl",
+    "test_path": "/public/home/202420144954/MIntRec-TCLMAP_generalize/MIntRec2.0/video_data/video_feats1.pkl",
+    "widths": {
+      "train": 256,
+      "dev": 256,
+      "test": 1024
+    },
+    "output_width": 1024,
+    "sequence_length": 230,
+    "truncated_samples": {
+      "train": 23,
+      "dev": 5,
+      "test": 0
+    }
+  },
+  "audio": {
+    "source_path": "/public/home/202420144954/MIntRec-TCLMAP_generalize/MIntRec2.0/audio_data/audio_feats.pkl",
+    "test_path": "/public/home/202420144954/MIntRec-TCLMAP_generalize/MIntRec2.0/audio_data/audio_feats1.pkl",
+    "widths": {
+      "train": 768,
+      "dev": 768,
+      "test": 768
+    },
+    "output_width": 768,
+    "sequence_length": 480,
+    "truncated_samples": {
+      "train": 27,
+      "dev": 7,
+      "test": 0
+    }
+  }
+}

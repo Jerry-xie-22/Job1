@@ -1,0 +1,6 @@
+acc,f1,prec,rec,weighted_f1,weighted_prec,weighted_rec,eval_f1,dataset,method,text_backbone,seed,logger_name,lr,dropout_prob,weight_decay,num_experts,nheads,n_levels,attn_dropout,embed_dropout
+64.72,44.12,47.31,43.89,67.23,73.67,64.72,0.5015,MIntRec2.0,mag_bert,bert-large-uncased,2,mag_bert_MIntRec2.0_multi-class_2_2026-09-08-12-50-37,4e-06,0.5,0.03,5,8,5,0.1,0.2
+62.25,43.26,45.36,43.09,65.2,71.58,62.25,0.5048,MIntRec2.0,mag_bert,bert-large-uncased,9,mag_bert_MIntRec2.0_multi-class_9_2026-09-08-14-31-33,2e-05,0.6,0.03,2,8,5,0.1,0.2
+66.07,47.32,53.03,46.81,68.79,76.15,66.07,0.502,MIntRec2.0,mag_bert,bert-large-uncased,2,mag_bert_MIntRec2.0_multi-class_2_2026-09-08-17-06-45,2e-05,0.55,0.03,7,8,5,0.1,0.2
+71.46,68.11,68.64,70.72,71.08,73.68,71.46,0.6245,MIntRec2.0,mag_bert,bert-large-uncased,2,mag_bert_MIntRec2.0_multi-class_2_2026-09-08-18-58-04,2e-05,0.55,0.03,7,8,5,0.1,0.2
+72.13,67.49,71.54,69.39,71.51,74.26,72.13,0.6017,MIntRec2.0,mag_bert,bert-large-uncased,2,mag_bert_MIntRec2.0_multi-class_2_2026-09-08-20-26-22,2e-05,0.55,0.03,2,8,5,0.1,0.2

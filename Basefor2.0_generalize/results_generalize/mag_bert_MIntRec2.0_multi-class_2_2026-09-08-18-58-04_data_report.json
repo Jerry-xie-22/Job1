@@ -1,0 +1,85 @@
+{
+  "source_dataset": "MIntRec2.0",
+  "target_dataset": "MIntRec",
+  "protocol": "20-class shared-label evaluation",
+  "label_order": [
+    "Complain",
+    "Praise",
+    "Apologise",
+    "Thank",
+    "Criticize",
+    "Agree",
+    "Taunt",
+    "Flaunt",
+    "Joke",
+    "Oppose",
+    "Comfort",
+    "Care",
+    "Inform",
+    "Advise",
+    "Arrange",
+    "Introduce",
+    "Leave",
+    "Prevent",
+    "Greet",
+    "Ask for help"
+  ],
+  "splits": {
+    "train": {
+      "path": "/public/home/202420144954/job1/Basefor2.0_generalize/MIntRec2.0_train_20.tsv",
+      "dataset": "MIntRec2.0",
+      "total": 4125,
+      "retained": 4125,
+      "excluded_by_label": {},
+      "coverage": 1.0
+    },
+    "dev": {
+      "path": "/public/home/202420144954/job1/Basefor2.0_generalize/MIntRec2.0_dev_20.tsv",
+      "dataset": "MIntRec2.0",
+      "total": 726,
+      "retained": 726,
+      "excluded_by_label": {},
+      "coverage": 1.0
+    },
+    "test": {
+      "path": "/public/home/202420144954/MIntRec-TCLMAP_generalize/MIntRec2.0/test.tsv",
+      "dataset": "MIntRec",
+      "total": 445,
+      "retained": 445,
+      "excluded_by_label": {},
+      "coverage": 1.0
+    }
+  },
+  "video": {
+    "source_path": "/public/home/202420144954/MIntRec-TCLMAP_generalize/MIntRec2.0/video_data/video_feats.pkl",
+    "test_path": "/public/home/202420144954/MIntRec-TCLMAP_generalize/MIntRec2.0/video_data/video_feats1.pkl",
+    "widths": {
+      "train": 256,
+      "dev": 256,
+      "test": 256
+    },
+    "output_width": 256,
+    "sequence_length": 230,
+    "truncated_samples": {
+      "train": 11,
+      "dev": 4,
+      "test": 0
+    }
+  },
+  "audio": {
+    "source_path": "/public/home/202420144954/MIntRec-TCLMAP_generalize/MIntRec2.0/audio_data/audio_feats.pkl",
+    "test_path": "/public/home/202420144954/MIntRec-TCLMAP_generalize/MIntRec2.0/audio_data/audio_feats1.pkl",
+    "widths": {
+      "train": 768,
+      "dev": 768,
+      "test": 768
+    },
+    "output_width": 768,
+    "sequence_length": 480,
+    "truncated_samples": {
+      "train": 14,
+      "dev": 5,
+      "test": 0
+    }
+  }
+}

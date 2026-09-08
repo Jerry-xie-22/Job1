@@ -2,7 +2,6 @@ cache
 logs
 __pycache__
 outputs
-results_generalize/
 *.bin
 *.pt
 *.pth
