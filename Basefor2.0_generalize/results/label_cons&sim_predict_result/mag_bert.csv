@@ -1,0 +1,11 @@
+acc,f1,prec,rec,eval_f1,dataset,method,text_backbone,seed,logger_name
+72.81,68.44,69.08,69.95,0.7017,MIntRec,mag_bert,bert-base-uncased,0,mag_bert_MIntRec_multi-class_0_2025-08-11-08-05-55
+72.58,67.72,68.58,68.01,0.7089,MIntRec,mag_bert,bert-base-uncased,1,mag_bert_MIntRec_multi-class_1_2025-08-11-08-12-23
+67.87,64.7,64.79,66.15,0.7149,MIntRec,mag_bert,bert-base-uncased,2,mag_bert_MIntRec_multi-class_2_2025-08-11-08-19-05
+70.79,66.98,66.7,68.16,0.7058,MIntRec,mag_bert,bert-base-uncased,3,mag_bert_MIntRec_multi-class_3_2025-08-11-08-24-54
+72.36,67.87,67.41,69.38,0.7193,MIntRec,mag_bert,bert-base-uncased,4,mag_bert_MIntRec_multi-class_4_2025-08-11-08-32-03
+71.69,68.28,67.82,69.78,0.7090000000000001,MIntRec,mag_bert,bert-base-uncased,5,mag_bert_MIntRec_multi-class_5_2025-08-11-08-40-06
+70.34,67.06,66.79,68.69,0.7129,MIntRec,mag_bert,bert-base-uncased,6,mag_bert_MIntRec_multi-class_6_2025-08-11-08-46-26
+71.69,68.85,69.26,69.71,0.7137,MIntRec,mag_bert,bert-base-uncased,7,mag_bert_MIntRec_multi-class_7_2025-08-11-08-55-03
+69.89,64.09,63.4,66.26,0.6842,MIntRec,mag_bert,bert-base-uncased,8,mag_bert_MIntRec_multi-class_8_2025-08-11-09-03-32
+73.26,68.28,68.64,69.03,0.7243,MIntRec,mag_bert,bert-base-uncased,9,mag_bert_MIntRec_multi-class_9_2025-08-11-09-09-20
